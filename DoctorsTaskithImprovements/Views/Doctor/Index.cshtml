@@ -1,0 +1,78 @@
+﻿<div class="container">
+    <div class="d-flex mb-5">
+        <div class="col-5">
+            <select id="specializationSelect" class="form-select">
+                <option value="0">All Specialization</option>
+                @foreach (var spec in Model.Specialization)
+                {
+                    <option value="@spec.Value">@spec.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-5">
+            <input id="docNameInput" class="form-control" placeholder="Doctor Name" />
+        </div>
+        <div class="col-2">
+            <button id="filterBtn" type="button" class="btn btn-primary">Filter</button>
+        </div>
+
+    </div>
+
+    <div class="row"> </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/realtimehub")
+            .build();
+
+        connection.start().then(() => {
+            console.log("SignalR connected");
+            triggerFilter();
+        });
+
+        // document.getElementById("filterBtn").addEventListener("click", function () {
+        //     const docName = document.getElementById("docNameInput").value;
+        //     const specializationId = document.getElementById("specializationSelect").value;
+
+        //     connection.invoke("FilterDoctorsClientToServer", docName, parseInt(specializationId));
+        // });
+
+
+        function triggerFilter() {
+            const docName = document.getElementById("docNameInput").value;
+            const specializationId = parseInt(document.getElementById("specializationSelect").value);
+
+            connection.invoke("FilterDoctorsClientToServer", docName, specializationId);
+        }
+
+        // Run filter on every key press in doctor name input
+        document.getElementById("docNameInput").addEventListener("keyup", triggerFilter);
+
+        // Run filter when specialization changes
+        document.getElementById("specializationSelect").addEventListener("change", triggerFilter);
+
+        connection.on("ReceiveFilteredDoctors", function (doctors) {
+            const container = document.querySelector(".row");
+            container.innerHTML = "";
+
+            doctors.forEach(doctor => {
+                container.innerHTML += `
+                    <div class="col-4">
+                        <div class="card" style="width: 18rem;">
+                            <img src="/images/${doctor.img}" height="400px" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">${doctor.name}</h5>
+                                <p class="card-text">${doctor.specialization}</p>
+                                <a href="/Doctor/book/${doctor.id}" class="btn btn-primary">Book</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    </script>
+}

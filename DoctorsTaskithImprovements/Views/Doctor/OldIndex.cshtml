@@ -1,0 +1,41 @@
+﻿@using DoctorsTaskithImprovements.Models.ViewModels
+@model ListOfDoctorsAndSpecializationVM
+
+<div class="container">
+    <div class=" mb-4">
+        <form action="">
+           <div class="row">
+                <div class="col-4">
+                    
+                    <select class="form-select" asp-items="Model.Specialization" asp-for="SpecializationId">
+                        <option> All Specialization</option>
+
+                    </select>
+                </div>
+                <div class="col-4">
+                    
+                    <input  class="form-control" placeholder="Doctor Name" asp-for="DocName" />
+                </div>
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+           </div>
+        </form>
+    </div>
+
+    <div class="row">
+        @foreach(var item in Model.Doctors)
+        {
+            <div class="col-4">
+                <div class="card" style="width: 18rem;">
+                    <img src="~/images/@item.Img" height="400px" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Name</h5>
+                        <p class="card-text">@item.Specialization.Name</p>
+                        <a href="/Doctor/book/id" class="btn btn-primary">Book</a>
+                    </div>
+                </div>
+            </div>
+        }
+        </div>
+    </div>
