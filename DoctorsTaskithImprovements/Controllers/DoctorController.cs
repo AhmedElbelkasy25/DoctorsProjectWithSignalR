@@ -4,29 +4,38 @@ using DoctorsTaskithImprovements.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace DoctorsTaskithImprovements.Controllers
 {
     public class DoctorController : Controller
     {
-        private readonly ApplicationDbContext _dbContext = new ApplicationDbContext();
-        public IActionResult Index(string? DocName = null , int SpecializationId = 0)
+        public DoctorController(IStringLocalizer<GlobalResource> loc)
         {
-            IQueryable<Doctor> doctors = _dbContext.Doctors
-                .Include(d => d.Specialization);
-                
-            if(DocName != null)
-            {
-                doctors = doctors.Where(d => d.Name.Contains(DocName));
-            }
+            this.loc = loc;
+        }
+        private readonly ApplicationDbContext _dbContext = new ApplicationDbContext();
+        private readonly IStringLocalizer<GlobalResource> loc;
 
-            if (SpecializationId > 0)
-            {
-                doctors = doctors.Where(d => d.SpecializationId == SpecializationId);
-            }
+        public IActionResult Index(string? DocName = null , int SpecializationId = 0 )
+        {
+            
+            ViewData["Hello"] = loc["hello"];
+            //IQueryable<Doctor> doctors = _dbContext.Doctors
+            //    .Include(d => d.Specialization);
+                
+            //if(DocName != null)
+            //{
+            //    doctors = doctors.Where(d => d.Name.Contains(DocName));
+            //}
+
+            //if (SpecializationId > 0)
+            //{
+            //    doctors = doctors.Where(d => d.SpecializationId == SpecializationId);
+            //}
             var allSpecialization = _dbContext.Specializations.Select(e=> new SelectListItem() 
             {Text =e.Name , Value = e.Id.ToString()}).ToList();
-            var model = new ListOfDoctorsAndSpecializationVM() {  Doctors=doctors.ToList(),
+            var model = new ListOfDoctorsAndSpecializationVM() { /* Doctors=doctors.ToList(),*/
             Specialization = allSpecialization
             };
             return View(model);
